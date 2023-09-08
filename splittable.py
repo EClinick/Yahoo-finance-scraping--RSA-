@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import time
 from datetime import datetime, timedelta
 # Set up the web driver
-driver = webdriver.Chrome()
+driver = webdriver.Edge()
 
 # Get the HTML content from the link
 
@@ -43,7 +43,7 @@ driver.quit()
 filter_by_length = input("Do you want to filter by tickers that only have 3-4 characters? (yes/no): ")
 
 # Set up the web driver again
-driver = webdriver.Chrome()
+driver = webdriver.Edge()
 
 # Get the HTML content from the link again
 driver.get(url)
