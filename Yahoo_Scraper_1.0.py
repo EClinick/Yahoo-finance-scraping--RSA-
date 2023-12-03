@@ -1,7 +1,10 @@
+#Old version
+
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import time
 from datetime import datetime, timedelta
+import sys
 # Set up the web driver
 driver = webdriver.Edge()
 
@@ -9,9 +12,12 @@ driver = webdriver.Edge()
 
 def get_week_dates():
     today = datetime.today()
-    #today=+1
-    # Calculate the Sunday and Saturday dates of the current week
-    sunday = today - timedelta(days=today.weekday())
+    # Calculate the next Sunday date
+    days_ahead = 6 - today.weekday()  # Number of days until next Sunday
+    if days_ahead < 0:  # If today is Sunday, get date for next Sunday
+        days_ahead += 7
+    sunday = today + timedelta(days=days_ahead)
+    # Calculate the Saturday date of the next week
     saturday = sunday + timedelta(days=6)
     return sunday.strftime('%Y-%m-%d'), saturday.strftime('%Y-%m-%d')
 
@@ -24,14 +30,16 @@ if __name__ == "__main__":
     target_date = datetime.today().strftime('%Y-%m-%d')
     
     print("Start Date:", start_date)
-    print("End Date:", end_date)
-    print("Target Date:", target_date)
+    print("End Date:", end_date)# end_date= 2023-12-09
+    print("Target Date:", target_date) #target_date= 2023-12-02
+    
     
 
 
 url = f"https://finance.yahoo.com/calendar/splits?from={start_date}&to={end_date}&day={start_date}"
+#url=f"https://finance.yahoo.com/calendar/splits?from=2023-12-03&to=2023-12-09"
 driver.get(url)
-
+print(url)
 # Wait for the page to fully load
 driver.implicitly_wait(10)
 
@@ -69,10 +77,17 @@ for link in links:
 
 # Print the symbols/tickers and links
 print("The symbols/tickers and their links on that page are:")
+filtered_symbols_and_links = []
 for symbol, href in symbols_and_links:
     # Check if the user wants to filter by length and if the symbol has 3-4 characters
     if filter_by_length.lower() == "yes" and len(symbol) not in [3, 4]:
         continue # Skip this symbol if it doesn't meet the criteria
+    filtered_symbols_and_links.append((symbol, href))
+
+if not filtered_symbols_and_links:
+    print("None closing program...") # Print "None" if there are no stocks with 3-4 characters
+    sys.exit() # Exit the program if there are no stocks with 3-4 characters
+for symbol, href in filtered_symbols_and_links:
     print(f"{symbol}: {href}")
 
 # Close the web driver again
